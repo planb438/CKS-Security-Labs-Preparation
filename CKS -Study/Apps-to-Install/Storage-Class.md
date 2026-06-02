@@ -16,12 +16,13 @@ This creates PersistentVolumes using disk space on your worker nodes.
 bash
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
 
---
+---
+
 2. Set as Default StorageClass:
 bash
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
---
+---
 
 3. Verify:
 bash
@@ -48,7 +49,7 @@ echo "/mnt/nfs *(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/ex
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
 
---
+---
 
 2. Install NFS Client Provisioner:
 bash
