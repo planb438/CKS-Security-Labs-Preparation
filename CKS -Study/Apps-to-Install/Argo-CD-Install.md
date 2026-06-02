@@ -24,7 +24,7 @@ git init
 Step 2: Install Argo CD
 A. Create Namespace
 bash
-
+kubectl create ns argocd
 
 B. Apply Official Manifest
 bash
