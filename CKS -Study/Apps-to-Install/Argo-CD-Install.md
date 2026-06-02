@@ -19,7 +19,7 @@ bash
 mkdir argocd-setup && cd argocd-setup
 git init
 
---
+---
 
 Step 2: Install Argo CD
 A. Create Namespace
@@ -40,7 +40,7 @@ argocd-applicationset-controller (GitOps engine)
 
 argocd-repo-server (Git sync)
 
---
+---
 
 Step 3: Access Argo CD
 A. Expose Argo CD UI
@@ -54,7 +54,7 @@ bash
 kubectl get svc -n argocd argocd-server
 Access: http://<worker-node-ip>:<NodePort>
 
--
+---
 
 Option 2: Ingress (Production)
 
@@ -86,13 +86,13 @@ EOF
 
 B. Retrieve Admin Password
 
--
+---
 
 bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 Save this password securely!
 
---
+---
 
 Step 4: Configure CLI (Optional but Recommended)
 bash
@@ -104,7 +104,7 @@ Login via CLI:
 bash
 argocd login <argocd-server-address> --username admin --password <password-from-step-3b>
 
---
+---
 
 Step 5: Document in Git
 A. Structure Your Repo
@@ -133,7 +133,7 @@ git commit -m "Initial Argo CD installation manifests"
 git remote add origin <your-git-repo-url>
 git push -u origin main
 
---
+---
 
 Step 6: Deploy Your First App via Argo CD
 A. Create an Application Manifest
@@ -165,7 +165,7 @@ bash
 kubectl apply -f apps/my-app.yaml
 UI: Go to Argo CD → "+ New App" → Paste YAML.
 
---
+---
 
 Step 7: Verify Sync
 bash
@@ -207,6 +207,7 @@ A foundation for GitOps workflows
 Want to try deploying a sample app (e.g., NGINX) next?
 
 ---
+
 argocd app get my-app
 {"level":"fatal","msg":"Argo CD server address unspecified ,argocd app sync my-app --force
 {"level":"fatal","msg":"Argo CD server address unspecified","time":"2025-08-19T03:33:03Z"}
@@ -292,6 +293,7 @@ argocd app create my-gitops-app \
   --dest-namespace default
 
 ---
+
 argocd app get my-app
 Name:               argocd/my-app
 Project:            default
@@ -396,6 +398,7 @@ argocd app set my-app --auto-prune
 Let me know if you need help with Git authentication!
 
 ---
+
 argocd repo add https://github.com/planb438/Argo-CD.git \
 >  --username plab438 \
 >    --password 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
@@ -438,7 +441,8 @@ ComparisonError  Failed to load target state: failed to generate manifest for so
 
 master-node-001@master-node-001:~/argocd-setup/apps$
 
--
+---
+
 It looks like you're encountering two key issues with your Argo CD setup:
 
 Authentication Problems (Repository not found)
