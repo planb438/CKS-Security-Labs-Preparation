@@ -6,7 +6,7 @@
 
 ## Horizontal Pod Autoscaler (HPA)
 
-ChatGPT said:
+
 Great! Let continue with the Horizontal Pod Autoscaler (HPA) a key mechanism for dynamic scaling based on resource usage.
 
 4. Horizontal Pod Autoscaler (HPA)
