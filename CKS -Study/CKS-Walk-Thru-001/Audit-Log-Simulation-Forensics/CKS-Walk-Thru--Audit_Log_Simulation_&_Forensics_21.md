@@ -90,3 +90,69 @@ You’re now practicing forensics!
 Would you like to try simulating a malicious container action and watch Falco + audit logs react next?
 
 
+---
+
+
+audit logging still isn't working. Let's check the actual API server process to see if the audit flags are loaded:
+
+bash
+# Check the full command line of the running API server
+sudo ps aux | grep kube-apiserver | grep -v grep
+
+# Or check the process details
+sudo cat /proc/$(pgrep -f "kube-apiserver")/cmdline | tr '\0' '\n' | grep audit
+Also check the API server logs for audit-related errors:
+
+bash
+# Check API server logs for audit errors
+sudo crictl logs $(sudo crictl ps --name kube-apiserver -q) 2>&1 | grep -i audit
+
+# Or check kubelet logs
+sudo journalctl -u kubelet --since "2 minutes ago" | grep -i audit
+Most likely issue: The audit policy file path is wrong or not mounted. Check the volume mounts in your manifest:
+
+bash
+# Look for audit volume mounts in the running API server
+sudo cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep -A2 -B2 audit
+From the manifest you showed earlier, I notice there are NO volume mounts for the audit policy or log directory. The API server needs these mount points to access the files.
+
+Fix: Add volume mounts to the manifest
+Edit the manifest:
+
+bash
+sudo vi /etc/kubernetes/manifests/kube-apiserver.yaml
+Add these volumeMounts under spec.containers[0].volumeMounts:
+
+yaml
+    volumeMounts:
+    - mountPath: /etc/kubernetes/audit-policy.yaml
+      name: audit-policy
+      readOnly: true
+      subPath: audit-policy.yaml
+    - mountPath: /var/log/kubernetes
+      name: audit-log
+And add these volumes under spec.volumes:
+
+yaml
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/audit-policy.yaml
+      type: File
+    name: audit-policy
+  - hostPath:
+      path: /var/log/kubernetes
+      type: DirectoryOrCreate
+    name: audit-log
+Save and exit. Kubelet will auto-restart the API server. Then check again:
+
+bash
+# Wait 30 seconds
+sleep 30
+
+# Test with kubectl to generate logs
+kubectl get pods -A
+
+# Check audit log
+sudo cat /var/log/kubernetes/audit.log | head -20
+
+
