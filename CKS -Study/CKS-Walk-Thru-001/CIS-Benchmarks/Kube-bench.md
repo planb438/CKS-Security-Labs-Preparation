@@ -25,9 +25,5 @@ tar -xf kube-bench_0.4.0_linux_amd64.tar.gz
 
 ---
 
-./kube-bench --config-dir `pwd`/cfg --config `pwd`/cfg/config.yaml 
-
-or
-
-kube-bench --config-dir ./cfg
+./kube-bench --config-dir `pwd`/cfg --config `pwd`/cfg/config.yaml
 
