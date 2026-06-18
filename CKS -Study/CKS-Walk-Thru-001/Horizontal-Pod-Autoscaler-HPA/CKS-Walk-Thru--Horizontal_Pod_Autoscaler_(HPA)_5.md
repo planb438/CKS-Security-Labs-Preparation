@@ -7,76 +7,76 @@
 ## Horizontal Pod Autoscaler (HPA)
 
 
-Great! Let continue with the Horizontal Pod Autoscaler (HPA) a key mechanism for dynamic scaling based on resource usage.
+#### Great! Let continue with the Horizontal Pod Autoscaler (HPA) a key mechanism for dynamic scaling based on resource usage.
 
-4. Horizontal Pod Autoscaler (HPA)
+#### 4. Horizontal Pod Autoscaler (HPA)
 
-Purpose
-HPA automatically adjusts the number of pod replicas in a deployment based on observed CPU (or memory/custom metrics) usage.
+#### Purpose
+#### HPA automatically adjusts the number of pod replicas in a deployment based on observed CPU (or memory/custom metrics) usage.
 
- Prerequisites
-• Metrics Server must be installed and running.
+####  Prerequisites
+#### • Metrics Server must be installed and running.
 
 
-kubectl get deployment metrics-server -n kube-system
-
- HPA Example for CPU-based Scaling
-yaml
+#### kubectl get deployment metrics-server -n kube-system
+#### 
+####  HPA Example for CPU-based Scaling
+#### yaml
 
 
 apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: node-app-hpa
-  namespace: dev
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: node-app
-  minReplicas: 2
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
+#### kind: HorizontalPodAutoscaler
+#### metadata:
+####   name: node-app-hpa
+####   namespace: dev
+#### spec:
+####   scaleTargetRef:
+####     apiVersion: apps/v1
+####     kind: Deployment
+####     name: node-app
+####   minReplicas: 2
+####   maxReplicas: 5
+####   metrics:
+####   - type: Resource
+####     resource:
+####       name: cpu
+####       target:
         type: Utilization
-        averageUtilization: 50
+####         averageUtilization: 50
 
 
-You can also generate it with kubectl:
+#### You can also generate it with kubectl:
 
-kubectl autoscale deployment node-app --cpu-percent=50 --min=2 --max=5 -n dev
-
-
-
-Security and Operational Notes
-
-| Practice | Why It Matters |
-| Donβt set maxReplicas too high | Avoid DoS via runaway scaling |
-| Validate metrics before relying on HPA | Ensure metrics-server is stable |
-| Always define CPU requests | HPA uses requested CPU as baseline |
-| Watch for flapping | Use stabilizationWindowSeconds if needed in autoscaling/v2 |
+#### kubectl autoscale deployment node-app --cpu-percent=50 --min=2 --max=5 -n dev
 
 
 
- Verification
-t
+#### Security and Operational Notes
+
+#### | Practice | Why It Matters |
+#### | Donβt set maxReplicas too high | Avoid DoS via runaway scaling |
+#### | Validate metrics before relying on HPA | Ensure metrics-server is stable |
+#### | Always define CPU requests | HPA uses requested CPU as baseline |
+#### | Watch for flapping | Use stabilizationWindowSeconds if needed in autoscaling/v2 |
 
 
-kubectl get hpa -n dev
-kubectl describe hpa node-app-hpa -n dev
-kubectl top pods -n dev
+
+####  Verification
+#### t
 
 
-Optional: Load test the app using hey, ab, or k6 to observe scaling in action.
-What You Should Remember
-◇ HPA is effective when paired with correct resource requests.
+#### kubectl get hpa -n dev
+#### kubectl describe hpa node-app-hpa -n dev
+#### kubectl top pods -n dev
 
-◇ You can use custom metrics with Prometheus Adapter later.
 
-◇ Ensure metrics-server is healthy itβs your HPA heartbeat.
+#### Optional: Load test the app using hey, ab, or k6 to observe scaling in action.
+#### What You Should Remember
+#### ◇ HPA is effective when paired with correct resource requests.
+
+#### ◇ You can use custom metrics with Prometheus Adapter later.
+
+#### ◇ Ensure metrics-server is healthy itβs your HPA heartbeat.
 
 
 
