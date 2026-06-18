@@ -6,73 +6,73 @@
 
 ## helm
 
-1. Helm: Installed, Used for App Deployment
+#### 1. Helm: Installed, Used for App Deployment
 
-Purpose
-Helm is a package manager for Kubernetes. It simplifies deploying and managing applications via reusable "charts."
+#### Purpose
+#### Helm is a package manager for Kubernetes. It simplifies deploying and managing applications via reusable "charts."
 
-Setup Checklist
-1. Install Helm (on control plane node):
-
-
-
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#### Setup Checklist
+#### 1. Install Helm (on control plane node):
 
 
 
-2. Verify Installation:
+#### curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 
 
-helm version
+#### 2. Verify Installation:
 
 
 
-3. Add Chart Repositories: Example:
+#### helm version
 
 
 
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+#### 3. Add Chart Repositories: Example:
 
 
 
-4. Deploy a Helm Chart (Node App Example):
+#### helm repo add bitnami https://charts.bitnami.com/bitnami
+#### helm repo update
 
 
 
-helm install node-app ./my-node-chart --namespace dev --create-namespace
+#### 4. Deploy a Helm Chart (Node App Example):
 
 
 
-5. Use Values.yaml for Customization: Helm lets you override chart defaults via --values or -f values.yaml.
-
-Security Best Practices
-
-| Practice | Explanation |
-| Use --namespace with Helm | Prevents cross-namespace clutter/conflicts |
-| Avoid Tiller (Helm v2) | Helm v3 is client-side, no server, safer |
-| Store secrets in sealed-secrets or external-secrets | Avoid putting secrets directly in values.yaml |
-| Restrict RBAC for Helm users | Create dedicated service accounts with minimal permissions |
+#### helm install node-app ./my-node-chart --namespace dev --create-namespace
 
 
 
+#### 5. Use Values.yaml for Customization: Helm lets you override chart defaults via --values or -f values.yaml.
 
-Verification
+#### Security Best Practices
+
+#### | Practice | Explanation |
+#### | Use --namespace with Helm | Prevents cross-namespace clutter/conflicts |
+#### | Avoid Tiller (Helm v2) | Helm v3 is client-side, no server, safer |
+#### | Store secrets in sealed-secrets or external-secrets | Avoid putting secrets directly in values.yaml |
+#### | Restrict RBAC for Helm users | Create dedicated service accounts with minimal permissions |
 
 
 
-helm list -n dev
-kubectl get all -n dev
+
+#### Verification
 
 
 
- What You Should Remember
-• Use Helm to deploy, upgrade, and rollback apps.
+#### helm list -n dev
+#### kubectl get all -n dev
 
-• Keep values.yaml parameterized and version-controlled.
 
-• Helm improves DRYness, repeatability, and auditing in Kubernetes deployments
+
+####  What You Should Remember
+#### • Use Helm to deploy, upgrade, and rollback apps.
+
+#### • Keep values.yaml parameterized and version-controlled.
+
+#### • Helm improves DRYness, repeatability, and auditing in Kubernetes deployments
 
 
 
