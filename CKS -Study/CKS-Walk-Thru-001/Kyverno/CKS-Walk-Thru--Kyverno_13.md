@@ -98,7 +98,6 @@
 
 
 #### ✅ Kyverno should block it with a validation error.
-#### Let me know once you've tested this — then we’ll jump to OPA Gatekeeper (Rego-based alternative). Ready?
 
 
 
