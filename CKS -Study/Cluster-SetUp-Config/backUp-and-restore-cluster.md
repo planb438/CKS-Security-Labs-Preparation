@@ -4,204 +4,192 @@
 [![YouTube](https://img.shields.io/badge/YouTube-TechShorts-red)](https://www.youtube.com/@adaribain)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Adari%20Bain-blue)](https://www.linkedin.com/in/adari-bain-298924152/)
 
---
 
-Backing up an etcd cluster 
+#### Backing up an etcd cluster 
 
---
 
-export ETCDCTL_API=3
+    export ETCDCTL_API=3
 
----
 
-sudo etcdctl --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \
-  snapshot save /home/master-node-001/backUp-Cluster-kubernetes.db
+     sudo etcdctl --endpoints=https://127.0.0.1:2379 \
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \
+     snapshot save /home/master-node-001/backUp-Cluster-kubernetes.db
 
----
 
-  sudo etcdctl --write-out=table snapshot status backUp-Cluster-kubernetes.db
+    sudo etcdctl --write-out=table snapshot status backUp-Cluster-kubernetes.db
 
-  ---
   
-export ETCDCTL_API=3
+    export ETCDCTL_API=3
 
----
 
-etcdctl --data-dir <data-dir-location> snapshot restore snapshot.db
+    etcdctl --data-dir <data-dir-location> snapshot restore snapshot.db
 
----
 
 Here's how to properly restore your etcd snapshot:
 
---
 
-Solution: Force Restore Etcd Snapshot
-First, stop kube-apiserver (to prevent conflicts):
+#### Solution: Force Restore Etcd Snapshot
+#### First, stop kube-apiserver (to prevent conflicts):
 
---
+#### --
 
-bash
-sudo systemctl stop kube-apiserver
-Remove the existing etcd data directory:
+#### bash
+    sudo systemctl stop kube-apiserver
+#### Remove the existing etcd data directory:
 
-bash
-sudo rm -rf /var/lib/etcd/default.etcd
-Restore the snapshot (using your original command with --data-dir flag):
+#### bash
+    sudo rm -rf /var/lib/etcd/default.etcd
+#### Restore the snapshot (using your original command with --data-dir flag):
 
-bash
-sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
-  --cert=/etc/kubernetes/pki/etcd/server.crt \
-  --key=/etc/kubernetes/pki/etcd/server.key \
-  snapshot restore /home/master-node-001/backUp-Cluster-kubernetes.db \
-  --data-dir=/var/lib/etcd/restored
-Update etcd service configuration (if you restored to a non-default path):
+#### bash
+    sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+    --cert=/etc/kubernetes/pki/etcd/server.crt \
+    --key=/etc/kubernetes/pki/etcd/server.key \
+    snapshot restore /home/master-node-001/backUp-Cluster-kubernetes.db \
+    --data-dir=/var/lib/etcd/restored
+#### Update etcd service configuration (if you restored to a non-default path):
 
-bash
-sudo vim /etc/kubernetes/manifests/etcd.yaml
-Change the --data-dir flag to point to your restored directory:
+#### bash
+    sudo vim /etc/kubernetes/manifests/etcd.yaml
+#### Change the --data-dir flag to point to your restored directory:
 
-yaml
-- --data-dir=/var/lib/etcd/restored
-Restart etcd and kube-apiserver:
+#### yaml
+#### - --data-dir=/var/lib/etcd/restored
+#### Restart etcd and kube-apiserver:
 
-bash
-sudo systemctl restart kubelet
-sudo systemctl start kube-apiserver
-Verify the restore:
+#### bash
+    sudo systemctl restart kubelet
+    sudo systemctl start kube-apiserver
+#### Verify the restore:
 
-bash
-sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
-  --cert=/etc/kubernetes/pki/etcd/server.crt \
-  --key=/etc/kubernetes/pki/etcd/server.key \
-  get / --prefix --keys-only
-Alternative Method (If Using kubeadm)
-If you're using kubeadm, you can also restore the etcd snapshot like this:
+#### bash
+    sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+    --cert=/etc/kubernetes/pki/etcd/server.crt \
+    --key=/etc/kubernetes/pki/etcd/server.key \
+    get / --prefix --keys-only
+#### Alternative Method (If Using kubeadm)
+#### If you're using kubeadm, you can also restore the etcd snapshot like this:
 
-bash
-sudo kubeadm etcd snapshot restore /home/master-node-001/backUp-Cluster-kubernetes.db \
-  --data-dir=/var/lib/etcd/restored
-Key Notes
-Cluster Downtime: This process requires temporary downtime of the control plane.
+#### bash
+#### sudo kubeadm etcd snapshot restore /home/master-node-001/backUp-Cluster-kubernetes.db \
+####   --data-dir=/var/lib/etcd/restored
+#### Key Notes
+#### Cluster Downtime: This process requires temporary downtime of the control plane.
 
-Backup First: Always backup current etcd data before restoring.
+#### Backup First: Always backup current etcd data before restoring.
 
-Consistency: Ensure all control plane nodes are restored to the same snapshot if you have a multi-master setup.
+#### Consistency: Ensure all control plane nodes are restored to the same snapshot if you have a multi-master setup.
 
-sudo reboot
+    sudo reboot
 
----
 
-If you run sudo kubeadm reset --force followed by a restore from an etcd snapshot backup, here's exactly what will be included (and excluded) from your restored cluster state:
+#### If you run sudo kubeadm reset --force followed by a restore from an etcd snapshot backup, here's exactly what will be included (and excluded) from your restored cluster state:
 
---
 
-What's Included in the Restore ✅
+#### What's Included in the Restore ✅
 
---
 
-All Kubernetes Objects:
+#### All Kubernetes Objects:
 
-Pods, Deployments, Services, ConfigMaps, Secrets, etc.
+#### Pods, Deployments, Services, ConfigMaps, Secrets, etc.
 
-PersistentVolumeClaims (PVCs) and StorageClass definitions
+#### PersistentVolumeClaims (PVCs) and StorageClass definitions
 
-Namespaces and RBAC permissions
+#### Namespaces and RBAC permissions
 
-CRDs and custom resources
+#### CRDs and custom resources
 
-Cluster State:
+#### Cluster State:
 
-Exact state of all objects at the time of the etcd snapshot
+#### Exact state of all objects at the time of the etcd snapshot
 
-Node registration records (but see caveats below)
+#### Node registration records (but see caveats below)
 
-Kubernetes Internal Configs:
+#### Kubernetes Internal Configs:
 
-Cluster API versions and extensions
+#### Cluster API versions and extensions
 
-Scheduler/controller-manager states
+#### Scheduler/controller-manager states
 
-What's NOT Included ❌
+#### What's NOT Included ❌
 
---
 
-Node Components:
+#### Node Components:
 
-Kubelet configurations on worker nodes
+#### Kubelet configurations on worker nodes
 
-Container Runtime (Docker/containerd) state
+#### Container Runtime (Docker/containerd) state
 
-Actual container filesystems (only metadata is stored in etcd)
+#### Actual container filesystems (only metadata is stored in etcd)
 
-Persistent Volume Data:
+#### Persistent Volume Data:
 
-Contents of your PVs (unless you separately backed up storage)
+#### Contents of your PVs (unless you separately backed up storage)
 
-Example: If you used local-path, the actual data lives on node disks
+#### Example: If you used local-path, the actual data lives on node disks
 
-Network Configs:
+#### Network Configs:
 
-CNI plugin configurations (Calico/Flannel/etc.)
+#### CNI plugin configurations (Calico/Flannel/etc.)
 
-iptables rules or network policies
+#### iptables rules or network policies
+#### 
+#### Addons:
 
-Addons:
+#### Helm releases (unless stored as Kubernetes objects)
 
-Helm releases (unless stored as Kubernetes objects)
+#### Ingress controller deployments
 
-Ingress controller deployments
+#### Step-by-Step Recovery Process
+#### Reset the Cluster (on all control plane nodes):
 
-Step-by-Step Recovery Process
-Reset the Cluster (on all control plane nodes):
+#### bash
+    sudo kubeadm reset --force
+    sudo rm -rf /etc/kubernetes/pki
+#### Restore etcd Snapshot (on first control plane node):
 
-bash
-sudo kubeadm reset --force
-sudo rm -rf /etc/kubernetes/pki
-Restore etcd Snapshot (on first control plane node):
+#### bash
+    sudo kubeadm init phase etcd snapshot --snapshot-file=backup.db
+#### Reinitialize Control Plane:
 
-bash
-sudo kubeadm init phase etcd snapshot --snapshot-file=backup.db
-Reinitialize Control Plane:
+#### bash
+    sudo kubeadm init --ignore-preflight-errors=DirAvailable--var-lib-etcd
+#### Rejoin Worker Nodes:
 
-bash
-sudo kubeadm init --ignore-preflight-errors=DirAvailable--var-lib-etcd
-Rejoin Worker Nodes:
-
-bash
-kubeadm token create --print-join-command
+#### bash
+#### kubeadm token create --print-join-command
 # Run output on worker nodes
-Restore Network Plugin:
+#### Restore Network Plugin:
 
-bash
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-Critical Post-Restore Actions
-Verify Persistent Volume Claims:
+#### bash
+    kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+#### Critical Post-Restore Actions
+#### Verify Persistent Volume Claims:
 
-bash
-kubectl get pvc --all-namespaces -o wide
-Check Node Status:
+#### bash
+#### kubectl get pvc --all-namespaces -o wide
+#### Check Node Status:
 
-bash
-kubectl get nodes
-# If nodes show "NotReady", restart kubelet:
-sudo systemctl restart kubelet
-Restore Addons:
+#### bash
+#### kubectl get nodes
+#### # If nodes show "NotReady", restart kubelet:
+#### sudo systemctl restart kubelet
+#### Restore Addons:
 
-Reinstall CoreDNS, metrics-server, etc.:
+#### Reinstall CoreDNS, metrics-server, etc.:
 
-bash
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-Pro Tip: Full Cluster Recovery Checklist
-For a comprehensive restore, you should have:
+#### bash
+    kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+#### Pro Tip: Full Cluster Recovery Checklist
+#### For a comprehensive restore, you should have:
 
-Etcd snapshot (cluster state)
+#### Etcd snapshot (cluster state)
 
-PV data backup (e.g., Velero/Restic)
+#### PV data backup (e.g., Velero/Restic)
 
-CNI config backups
+#### CNI config backups
 
-Kubeadm config files (/etc/kubernetes/admin.conf)
+#### Kubeadm config files (/etc/kubernetes/admin.conf)
 
