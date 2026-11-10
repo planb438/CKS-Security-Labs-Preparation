@@ -92,6 +92,7 @@ Compliance	CIS Benchmarks, NSA/CISA Kubernetes Hardening Guide
 ---
 This repository implements a complete GitOps security workflow:
 
+```text
 Security Policy Development → Policies written as YAML in Git
 
 Pull Request Review → Security team reviews changes
@@ -103,6 +104,7 @@ Argo CD Synchronization → Changes automatically deployed
 Continuous Monitoring → Falco detects policy violations
 
 Self-Healing → Argo CD corrects configuration drift
+```
 
 ---
 
@@ -166,4 +168,4 @@ Updated: March 2024 | Maintainer: Adari Bain | Certifications: CKS, CKA, AWS SA
 2. Clone this repo:
    ```bash
    git clone https://github.com/planb438/CKS-Security-Labs.git
-   cd 
+   cd
